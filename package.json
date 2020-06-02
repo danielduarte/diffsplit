@@ -1,0 +1,23 @@
+{
+  "name": "@tandil/diffsplit",
+  "version": "0.1.0",
+  "description": "Easy split a .diff or .patch into its files",
+  "main": "index.js",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danielduarte/diff-split.git"
+  },
+  "keywords": [
+    "diff",
+    "split",
+    "patch"
+  ],
+  "author": "Daniel Duarte <danieldd.ar@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/danielduarte/diff-split/issues"
+  },
+  "homepage": "https://github.com/danielduarte/diff-split#readme"
+}
