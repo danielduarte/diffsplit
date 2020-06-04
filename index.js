@@ -1,6 +1,7 @@
+#!/usr/bin/env node
 /*!
  * Copyright (c) 2020 Daniel Duarte <danieldd.ar@gmail.com>
- * Licensed under MIT terms. See LICENSE file for details.
+ * Licensed under MIT License. See LICENSE file for details.
  */
 
 class Token {

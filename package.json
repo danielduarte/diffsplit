@@ -1,6 +1,6 @@
 {
   "name": "@tandil/diffsplit",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Easy split of .diff & .patch into its files",
   "main": "index.js",
   "scripts": {},
