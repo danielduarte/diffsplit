@@ -6,7 +6,7 @@ Easy split of .diff & .patch into its files
 
 ## What is this?
 
-This utility splits .diff or .patch files in [unified format](https://www.gnu.org/software/diffutils/manual/html_node/Unified-Format.html) into parts **by file** without deleting or overwriting anything.
+This CLI utility splits .diff or .patch files in [unified format](https://www.gnu.org/software/diffutils/manual/html_node/Unified-Format.html) into parts **by file** without deleting or overwriting anything.
 
 See a simple [example](#example)
 
@@ -19,6 +19,8 @@ npm i -g @tandil/diffsplit
 _Note that this requires Node.js installed._
 
 ## Usage
+
+In your terminal
 
 ```console
 diffsplit file1.diff file2.diff [... more files]
@@ -174,3 +176,7 @@ index 83449d4..733ae45 100644
  recently with desktop publishing software like Aldus PageMaker including
  versions of Lorem Ipsum.
 ```
+
+## Having issues?
+
+Feel free to report any issues or feature request in [Github repo](https://github.com/danielduarte/diffsplit/issues/new).
