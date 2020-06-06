@@ -75,7 +75,7 @@ files.forEach(f => {
 
   const diff = parser.parseDiffFileSync(f);
 
-  const errors = parser.getErrors();
+  const errors = diff.errors;
   if (errors.length === 0) {
     const result = generateFiles(diff, f);
     console.log(' OK' + (result.length === 0 ? '' : ':'));
