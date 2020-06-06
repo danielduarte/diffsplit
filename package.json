@@ -24,5 +24,11 @@
   "bugs": {
     "url": "https://github.com/danielduarte/diffsplit/issues"
   },
-  "homepage": "https://github.com/danielduarte/diffsplit#readme"
+  "homepage": "https://github.com/danielduarte/diffsplit#readme",
+  "dependencies": {
+    "@tandil/diffparse": "^0.1.2"
+  },
+  "files": [
+    "index.js"
+  ]
 }
