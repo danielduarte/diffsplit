@@ -1,0 +1,150 @@
+From f67d846006747efcfc9a96de42cb4e78bb23dc09 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Micha=C5=82=20Ciechan?= <michal.j.ciechan@gmail.com>
+Date: Sun, 1 Dec 2019 17:04:06 +0100
+Subject: [PATCH] Add selectable line numbers (#126)
+
+Registry component looks for "#LX-LY" or "#LX" in `location.hash`,
+selects code from line X to line Y and then scrolls to line X's position.
+
+Selected code has lighter or darker `background-color`
+(custom `hljs-selection` class added to each theme) according to
+atom-one-dark-ui[1] or atom-one-light-ui[2] style declarations. The themes'
+`@base-background-color` is based on the one in react-syntax-highlighter styles[3][4].
+For example in the dark theme `CodeBlock's` `background-color` is `#282c34`
+so `lighten(@base-background-color, 8%) = lighten(#282c34, 8%) => #3a404b`
+
+Added line numbers for increased readability.
+
+Edited `CodeBlock` component to use `react-syntax-highlighter's`
+`SyntaxHighlighterProps` instead of custom `Props` object.
+
+Fixes #43.
+
+[1] https://github.com/atom/one-dark-ui/blob/master/styles/ui-variables.less#L32
+[2] https://github.com/atom/one-light-ui/blob/master/styles/ui-variables.less#L32
+[3] https://github.com/conorhastings/react-syntax-highlighter/blob/master/src/styles/hljs/atom-one-dark.js#L7
+[4] https://github.com/conorhastings/react-syntax-highlighter/blob/master/src/styles/hljs/atom-one-light.js#L7
+---
+ src/CodeBlock.tsx | 19 +++++++++++++------
+ src/Registry.js   | 47 ++++++++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 55 insertions(+), 11 deletions(-)
+
+diff --git a/src/CodeBlock.tsx b/src/CodeBlock.tsx
+index 65b7e405..ecac3494 100644
+--- a/src/CodeBlock.tsx
++++ b/src/CodeBlock.tsx
+@@ -1,20 +1,27 @@
+ import React from "react";
+-import SyntaxHighlighter from "react-syntax-highlighter";
++import SyntaxHighlighter, {
++  SyntaxHighlighterProps
++} from "react-syntax-highlighter";
+ import lightTheme from "react-syntax-highlighter/dist/cjs/styles/hljs/atom-one-light";
+ import darkTheme from "react-syntax-highlighter/dist/cjs/styles/hljs/atom-one-dark";
+ import { useDarkMode } from "./theme";
+ 
+-interface Props {
+-  language?: string;
+-  value: string;
+-}
++lightTheme["hljs-selection"] = {
++  backgroundColor: "#ebebeb" // https://github.com/atom/one-light-ui/blob/master/styles/ui-variables.less#L32
++};
++darkTheme["hljs-selection"] = {
++  backgroundColor: "#3a404b" // https://github.com/atom/one-dark-ui/blob/master/styles/ui-variables.less#L32
++};
+ 
+-function CodeBlock(props: Props) {
++function CodeBlock(props: SyntaxHighlighterProps) {
+   const darkMode = useDarkMode();
+   return (
+     <SyntaxHighlighter
+       style={darkMode ? darkTheme : lightTheme}
+       language={props.language || "js"}
++      showLineNumbers={true}
++      wrapLines={true}
++      lineProps={props.lineProps}
+     >
+       {props.value}
+     </SyntaxHighlighter>
+diff --git a/src/Registry.js b/src/Registry.js
+index 4214a858..aff55324 100644
+--- a/src/Registry.js
++++ b/src/Registry.js
+@@ -14,9 +14,11 @@ export default function Registry() {
+     contents: null,
+     rawUrl: null,
+     repoUrl: null,
+-    dir: null
++    dir: null,
++    lineSelectionRange: null
+   });
+-  const { pathname, search } = useLocation();
++  const { pathname, search, hash } = useLocation();
++  const firstSelectedLine = React.useRef(null);
+ 
+   React.useEffect(() => {
+     setIsLoading(true);
+@@ -32,16 +34,34 @@ export default function Registry() {
+       });
+     } else {
+       // Render file.
++      const lineSelectionRangeMatch = hash.match(/^#L(\d+)(?:-L(\d+))?$/) || [];
++      lineSelectionRangeMatch.shift(); // Get rid of complete match
++      // Handle highlighting "#LX" (same as range [X, X])
++      if (
++        lineSelectionRangeMatch.length > 0 &&
++        lineSelectionRangeMatch[1] === undefined
++      ) {
++        lineSelectionRangeMatch[1] = lineSelectionRangeMatch[0];
++      }
++      const lineSelectionRange = lineSelectionRangeMatch.map(Number);
+       const rawUrl = `${entry.url}${path}`;
+       const repoUrl = `${entry.repo}${path}`;
+       console.log("fetch", rawUrl);
+       fetch(rawUrl).then(async response => {
+         const m = await response.text();
+-        setState({ contents: m, rawUrl, repoUrl });
++        setState({
++          contents: m,
++          rawUrl,
++          repoUrl,
++          lineSelectionRange
++        });
+         setIsLoading(false);
++        if (firstSelectedLine.current) {
++          window.scrollTo(0, firstSelectedLine.current.offsetTop);
++        }
+       });
+     }
+-  }, [pathname]);
++  }, [pathname, hash]);
+ 
+   let contentComponent;
+   if (isLoading) {
+@@ -103,7 +123,24 @@ export default function Registry() {
+               return <CodeBlock value="No documentation avaiable." />;
+             }
+           } else {
+-            return <CodeBlock value={state.contents} />;
++            return (
++              <CodeBlock
++                value={state.contents}
++                lineProps={lineNumber => {
++                  const lineProps = {};
++                  if (
++                    lineNumber >= state.lineSelectionRange[0] &&
++                    lineNumber <= state.lineSelectionRange[1]
++                  ) {
++                    lineProps.className = "hljs-selection";
++                  }
++                  if (lineNumber === state.lineSelectionRange[0]) {
++                    lineProps.ref = firstSelectedLine;
++                  }
++                  return lineProps;
++                }}
++              />
++            );
+           }
+         })()}
+       </div>

@@ -1,9 +1,11 @@
 {
   "name": "@tandil/diffsplit",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Easy split of .diff & .patch into its files",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "mocha"
+  },
   "bin": {
     "diffsplit": "index.js"
   },
@@ -26,7 +28,7 @@
   },
   "homepage": "https://github.com/danielduarte/diffsplit#readme",
   "dependencies": {
-    "@tandil/diffparse": "^0.1.2"
+    "@tandil/diffparse": "^0.2.0"
   },
   "files": [
     "index.js"

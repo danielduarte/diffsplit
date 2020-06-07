@@ -1,6 +1,7 @@
 # @tandil/diffsplit
-[![License](https://img.shields.io/npm/l/@tandil/diffsplit?color=%23007ec6)](https://github.com/danielduarte/diffsplit/blob/master/LICENSE)
 [![NPM Package Version](https://img.shields.io/npm/v/@tandil/diffsplit)](https://www.npmjs.com/package/@tandil/diffsplit)
+[![License](https://img.shields.io/npm/l/@tandil/diffsplit?color=%23007ec6)](https://github.com/danielduarte/diffsplit/blob/master/LICENSE)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-blue.svg)](https://conventionalcommits.org)
 
 Easy split of .diff & .patch into its files
 

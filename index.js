@@ -28,7 +28,7 @@ const getFreeFilename = filename => {
   return newFilename;
 };
 
-const generateFiles = (diff, diffFile) => {
+const generateOutput = (diff, diffFile, { output }) => {
   // If there is only one file (or zero), nothing is generated
   if (diff.files.length <= 1) {
     return [`Diff have ${diff.files.length === 1 ? '1 file' : '0 files'}, so no split was done`];
@@ -41,11 +41,14 @@ const generateFiles = (diff, diffFile) => {
     const write = line => {
       lines.push(line);
     };
+
     f.header && write(f.header);
-    f.mode && write(f.mode);
+    f.fileMode && write(f.fileMode);
+    f.oldMode && write(f.oldMode);
+    f.newMode && write(f.newMode);
     f.index && write(f.index);
-    write(f.old);
-    write(f.new);
+    f.oldFile && write(f.oldFile);
+    f.newFile && write(f.newFile);
     for (const ch of f.chunks) {
       write(ch.header);
       for (const l of ch.content) {
@@ -62,27 +65,72 @@ const generateFiles = (diff, diffFile) => {
   return [`Split in ${diff.files.length} files`];
 };
 
-const files = process.argv.slice(2);
+const split = opts => {
+  opts = Object.assign({
+    files: [],
+    output: 'write',
+  }, opts);
 
-files.forEach(f => {
-  console.log(`Processing file: "${f}"`);
+  opts.files.forEach(f => {
+    console.log(`Processing file: "${f}"`);
 
-  if (!fs.existsSync(f)) {
-    console.log(' Errors:');
-    console.log('  File does not exist');
-    return;
+    if (!fs.existsSync(f)) {
+      console.log(' Errors:');
+      console.log('  File does not exist');
+      console.log();
+      return;
+    }
+
+    const diff = parser.parseDiffFileSync(f);
+
+    const errors = diff.errors;
+    if (errors.length === 0) {
+      const result = generateOutput(diff, f, { output: opts.output });
+      console.log(' OK' + (result.length === 0 ? '' : ':'));
+      console.log('  ' + result.join('\n  '));
+    } else {
+      console.log(` Errors:`);
+      console.log('  ' + errors.join('\n  '));
+    }
+    console.log();
+  });
+};
+
+const getArgs = () => {
+  const cliArgs = process.argv.slice(2);
+
+  const args = {
+    files: [],
+  };
+
+  const paramRE =  /^--([a-zA-Z0-9_-]+)=(.*)$/;
+  const flagRE =  /^--([a-zA-Z0-9_-]+)$/;
+
+  for (const arg of cliArgs) {
+    if (arg.startsWith('--')) {
+
+      let matches = paramRE.exec(arg);
+      if (matches !== null) {
+        args[matches[1]] = matches[2];
+      } else {
+        matches = flagRE.exec(arg);
+        if (matches !== null) {
+          args[matches[1]] = true;
+        }
+      }
+
+    } else {
+      args.files.push(arg);
+    }
   }
 
-  const diff = parser.parseDiffFileSync(f);
+  return args;
+};
 
-  const errors = diff.errors;
-  if (errors.length === 0) {
-    const result = generateFiles(diff, f);
-    console.log(' OK' + (result.length === 0 ? '' : ':'));
-    console.log('  ' + result.join('\n  '));
-  } else {
-    console.log(` Errors:`);
-    console.log('  ' + errors.join('\n  '));
-  }
-  console.log();
-});
+
+const args = getArgs();
+
+split(args);
+
+
+module.exports = { split };
