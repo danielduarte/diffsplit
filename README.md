@@ -13,7 +13,7 @@ See a simple [example](#example)
 
 ## Installation
 
-```console
+```Shell
 npm i -g @tandil/diffsplit
 ```
 
@@ -23,7 +23,7 @@ _Note that this requires Node.js installed._
 
 In your terminal
 
-```console
+```Shell
 diffsplit file1.diff file2.diff [... more files]
 ```
 
@@ -31,7 +31,7 @@ diffsplit file1.diff file2.diff [... more files]
 
 Suppose you have a diff file `mypatch.diff` you created from a git diff and it includes modifications for 3 files:
 
-```
+```Diff
 diff --git a/es6.txt b/es6.txt
 index ca683c3..f1a9a31 100644
 --- a/es6.txt
@@ -85,7 +85,7 @@ index 83449d4..733ae45 100644
 
 Just running
 
-```console
+```Shell
 diffsplit mypatch.diff
 ```
 
@@ -118,7 +118,7 @@ mypatch_0003-1.diff
 In this example, the resulting files will content:
 
 **mypatch_0001.patch**
-```
+```Diff
 diff --git a/es6.txt b/es6.txt
 index ca683c3..f1a9a31 100644
 --- a/es6.txt
@@ -136,7 +136,7 @@ index ca683c3..f1a9a31 100644
 ```
 
 **mypatch_0002.patch**
-```
+```Diff
 diff --git a/life.txt b/life.txt
 index 39257de..6410213 100644
 --- a/life.txt
@@ -156,7 +156,7 @@ index 39257de..6410213 100644
 ```
 
 **mypatch_0003.patch**
-```
+```Diff
 diff --git a/lorem.txt b/lorem.txt
 index 83449d4..733ae45 100644
 --- a/lorem.txt

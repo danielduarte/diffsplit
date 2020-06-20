@@ -58,7 +58,7 @@ const generateOutput = (diff, diffFile, { output }) => {
 
     const filename = getFreeFilename(toIndexFilename(diffFile, i + 1));
 
-    const content = lines.join('\n');
+    const content = lines.join('\n') + '\n';
     fs.writeFileSync(filename, content);
   }
 
